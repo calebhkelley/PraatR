@@ -55,7 +55,8 @@ filetype,
 # [7]
 simplify
 # Only applicable if the user chooses a 'Query' command.
-# Determines whether the queried information will be coerced to numeric (i.e. just the core data) rather than remain as a text string (potentially along with various kinds of embellishing explanatory information).
+# Determines whether the queried information will be coerced to numeric (i.e. just the core data) rather than remain as a text string 
+# (potentially along with various kinds of embellishing explanatory information).
 # Either way, the result will (initially) be brought into R as a character string.
 # The user specifies this as TRUE or FALSE. This later gets translated into 1 or 0 when passed to Praat.
 
@@ -71,7 +72,7 @@ simplify
 ValidCommand = command %in% SupportedCommands$CommandName
 
 # Argument [1]
-if( !ValidCommand ){ stop("This command is not supported by the present version of PraatR.\n       Double-check that this is indeed a real Praat command, and then\n       feel free to contact the creator of PraatR.") }
+if(!ValidCommand){ stop("This command is not supported by the present version of PraatR.\n Double-check that this is indeed a real Praat command, and then \n feel free to contact the creator of PraatR.") }
 
 #############################
 # CLASSIFY SUPPLIED COMMAND #
@@ -84,12 +85,12 @@ if( !ValidCommand ){ stop("This command is not supported by the present version 
 # Fortunately, these conflations do not involve queries (which means that the execution of the command itself is fine and only the input validation might be messed up).
 # Thus, it is safe to randomly sample one of the two in these ambiguous cases (via the indexing of [1] in the following line of code).
 
-RowIndices = which( command == SupportedCommands$CommandName ) # All of them
+RowIndices = which(command == SupportedCommands$CommandName) # All of them
 RowIndex = RowIndices[1] # Just the first
 # For the three commands mentioned above, this will arbitrarily choose whichever comes first in terms of the ordering of the rows in the dataframe.
 # Special output filetypes are handled later below.
 
-CommandType = as.character( SupportedCommands[RowIndex,"CommandType"] )
+CommandType = as.character(SupportedCommands[RowIndex,"CommandType"])
 # At present, only four types are supported: 'Create', 'Modify', 'Query', and 'Play'.
 # The four yet un-implemented command types are 'Draw', 'Editor', 'Help', and 'Instructions'.
 
@@ -100,7 +101,7 @@ CommandType = as.character( SupportedCommands[RowIndex,"CommandType"] )
 # Argument [2] (arguments)
 # Make sure that, if the 'arguments' argument(!) is provided, it is a list
 if(!missing(arguments)){
-     if( class(arguments) != "list" ){ stop("The 'arguments' function must be a list.")}
+     if(class(arguments) != "list" ){ stop("The 'arguments' function must be a list.")}
 } # End 'if the user provided something as 'arguments'
 # Ultimately, this will need to be MUCH more rigid - checking the user's specified arguments against those from the SupportedCommands database to make sure everything lines up OK.
 # There *can* be arguments for 'Play' commands, so this is required even there.
@@ -120,7 +121,7 @@ if(CommandType=="Create"){
 
 # Argument [4] (output)
 # If the output is left unspecified, then issue an error and stop computation.
-if( missing(output) ){ stop("For this command, you must specify a file path for the 'output' argument.") }
+if(missing(output)){ stop("For this command, you must specify a file path for the 'output' argument.") }
 # The user can name the output file itself whatever they want.
 # However, I need to make sure the folder where they indicated that it should be placed actually exists (beyond the mere checking whether it equals "R" just performed).
 if( !file.exists( dirname(output) ) ){ stop(paste("The path in the 'output' argument includes a folder that does not exist:\n       ",dirname(output),sep="")) }
@@ -130,7 +131,7 @@ if( !file.exists( dirname(output) ) ){ stop(paste("The path in the 'output' argu
 # Fill in 'overwrite' with its default of FALSE if left unspecified
 if(missing(overwrite)){overwrite=FALSE}
 # If the 'overwrite' argument is set to FALSE, then if the output file already exists, cease computation
-if( overwrite==FALSE & file.exists(output) ){ stop(paste("This 'output' file already exists: (Consider setting overwrite=TRUE.)\n       ",output,sep="")) }
+if(overwrite==FALSE & file.exists(output)){ stop(paste("This 'output' file already exists: (Consider setting overwrite=TRUE.) \n ",output,sep="")) }
 
 } # End if this is a Create command 
 
@@ -139,14 +140,14 @@ if( overwrite==FALSE & file.exists(output) ){ stop(paste("This 'output' file alr
 
 if(CommandType=="Modify"){ # Then the interplay between 'overwrite' and 'output' is very complex...
 
-if( missing( output ) ){ output <- input } # Assume that the user intends the output file to be the same as the input file
+if(missing(output)){ output <- input } # Assume that the user intends the output file to be the same as the input file
 
-if( missing(overwrite) ){ # i.e. in the general case where the 'overwrite' argument is left unspecified
+if(missing(overwrite)){ # i.e. in the general case where the 'overwrite' argument is left unspecified
 
 if(output==input){ #... either by manual specification or the assumption from above
 overwrite=TRUE # Note that this is different from a 'Create' command
 }else{ # i.e. if the output file is manually specified to be something other than the input file
-if( file.exists(output) ){ stop(paste("This 'output' file already exists: (Consider setting overwrite=TRUE.)\n       ",output,sep="")) } # This is the normal stuff; same as 'Create'
+if( file.exists(output) ){ stop(paste("This 'output' file already exists: (Consider setting overwrite=TRUE.) \n ",output,sep="")) } # This is the normal stuff; same as 'Create'
 } # End 'if/else output is the same as input'
 
 }else{ # i.e. if the user explicitly mentions 'overwrite' and assign some value to it in their function call
@@ -161,7 +162,7 @@ stop("Either change 'overwrite' to TRUE or specify an output file different from
 
 }else{ # i.e. if the output and input are different
 
-if( file.exists(output) ){ stop(paste("This 'output' file already exists: (Consider setting overwrite=TRUE.)\n       ",output,sep="")) }
+if(file.exists(output)){ stop(paste("This 'output' file already exists: (Consider setting overwrite=TRUE.) \n ",output,sep="")) }
 
 } # End if/else output is the same as input
 
@@ -179,7 +180,7 @@ if(CommandType=="Create" | CommandType=="Modify"){
 # Argument [4] (output)
 # Make sure the path provided for 'output' does not contain any spaces
 SplitOutput = strsplit(output,split="")[[1]]
-if( " " %in% SplitOutput ){ stop("The file path provided for the 'output' argument must not contain spaces.\n  Perhaps rename the file or move it to a different folder.") }
+if( " " %in% SplitOutput ){ stop("The file path provided for the 'output' argument must not contain spaces. \n Perhaps rename the file or move it to a different folder.") }
 
 # Argument [6] (filetype)
 # Fill in 'filetype' with its default of "text" if left unspecified
@@ -192,17 +193,17 @@ if(filetype=="short"){filetype="short text"}
 
 # Second, determine which special file types are available for this command (if any)
 # If multiple matches are found in the database, retrieve all of them
-SpecialFileTypes_String = as.character( SupportedCommands[RowIndices,"SpecialFileTypes"] )
+SpecialFileTypes_String = as.character(SupportedCommands[RowIndices,"SpecialFileTypes"])
 
 # Strip out any NAs
-SpecialFileTypes_NoNAs = as.character( na.omit(SpecialFileTypes_String) )
+SpecialFileTypes_NoNAs = as.character(na.omit(SpecialFileTypes_String))
 # If there is nothing left, set it to NULL
 if(length(SpecialFileTypes_NoNAs)==0){
 SpecialFileTypes=NULL
 }else{
 
 # Make a sorted, unique list of everything across all returned rows from SupportedCommands
-SpecialFileTypes_Unique = sort(unique( SpecialFileTypes_NoNAs ))
+SpecialFileTypes_Unique = sort(unique(SpecialFileTypes_NoNAs))
 
 # Swap out the dummy '(SoundFormats)' with the actual list of possibilities
 if( "(Sound formats)" %in% SpecialFileTypes_Unique ){
@@ -210,21 +211,21 @@ SpecialFileTypes_Unique[SpecialFileTypes_Unique=="(Sound formats)"] <- "WAV, AIF
 } # End 'if "(Sound formats)" was found'
 
 # If there is a vector at this point, concatenate it together
-SpecialFileTypes_Concatenated = paste( SpecialFileTypes_Unique, collapse=", " )
+SpecialFileTypes_Concatenated = paste(SpecialFileTypes_Unique, collapse=", ")
 # This does nothing if 'SpecialFileTypes_Unique' is of length 1
 
-SpecialFileTypes=strsplit(SpecialFileTypes_Concatenated,split=", ")[[1]]
+SpecialFileTypes=strsplit(SpecialFileTypes_Concatenated, split=", ")[[1]]
 
 } # End 'if/else all entries were NA
 
 # Third, determine if the provided file type is a legal possibility (either one of the standard three or one of the special file types for this command)
-LegalFileType = filetype %in% append( c( "text", "short text", "binary"), # The standard three. Note the lack of "short" (since that was already handled above)
-                                       SpecialFileTypes ) # If SpecialFileTypes is NULL, this will append nothing, i.e. the result will be a vector with just the standard three.
+LegalFileType = filetype %in% append(c("text", "short text", "binary"), # The standard three. Note the lack of "short" (since that was already handled above)
+                                       SpecialFileTypes) # If SpecialFileTypes is NULL, this will append nothing, i.e. the result will be a vector with just the standard three.
 # Note that if there are multiple matches for the command name in the database (e.g. for a general-purpose command like 'Scale times by...'), it leniently allows all of them.
 # At present, it is the user's responsibility to make sure they are doing the right thing in these (relatively uncommon?) cases.
 
 # Stop computation if the specified filetype it is not legal
-if(!LegalFileType){ stop("The 'filetype' argument must be \"text\", \"short text\"/\"short\", \"binary\",\n  or one of the special formats listed on the PraatR website.") }
+if(!LegalFileType){ stop("The 'filetype' argument must be \"text\", \"short text\"/\"short\", \"binary\", \n or one of the special formats listed on the PraatR website.") }
 # If it is a legal file type, do nothing and move on
 
 # Finally, prepare the filetype for being passed to the shell command
@@ -246,7 +247,7 @@ if(CommandType=="Query"){
 
 # Argument [4] (output)
 # If something is specified for 'output', issue a warning that the specified output argument has been ignored, but still proceed normally.
-if( !missing(output) ){
+if(!missing(output)){
 warning("For Query commands, leave 'output' unspecified; the supplied value has been ignored.")
 }else{ # if it is indeed missing (as it should be), then fill it with a dummy 'X' just to make sure something gets passed to the Praat form.
 output="X"
@@ -274,7 +275,7 @@ if(CommandType=="Play"){
 # All four of the remaining commands are moot, so do similar things to above
 
 # Argument [4] (output)
-if( !missing(output) ){ warning("For Play commands, leave 'output' unspecified; the supplied value has been ignored.")
+if(!missing(output)){ warning("For Play commands, leave 'output' unspecified; the supplied value has been ignored.")
 }else{ output="X" } # Dummy
 
 # Argument [5] (overwrite)
@@ -352,7 +353,7 @@ UnderscoreSwapped = lapply(1:nArguments,FUN=function(n){
 ) # End call to lapply()
 
 # Now separate the arguments by spaces (so as to fit the syntax of shell() )
-ArgumentString = paste( UnderscoreSwapped, collapse=" ")
+ArgumentString = paste(UnderscoreSwapped, collapse=" ")
 
 } # End if/else arguments are missing from the function call
 
@@ -361,12 +362,12 @@ ArgumentString = paste( UnderscoreSwapped, collapse=" ")
 ##################################
 
 # This is necessary in case the user has multiple package folders (e.g. on Windows with RStudio installed)
-LibraryDirectories = unique( c( R.home("library"), .libPaths() ) )
+LibraryDirectories = unique(c(R.home("library"), .libPaths()))
 # On Windows, R.home("library") is something like "C:/PROGRA~1/R/R-30~1.3/library", which lacks a space, so this will work fine.
 # On Windows with RStudio, the only path with a space is listed last, which is safely ranked low enough not to ever be needed.
 
 # Add slashes if necessary
-LastCharacters = substring( LibraryDirectories,first=nchar(LibraryDirectories),last=nchar(LibraryDirectories) )
+LastCharacters = substring(LibraryDirectories,first=nchar(LibraryDirectories),last=nchar(LibraryDirectories))
 EndWithSlash = LastCharacters == "/" # The functions in the previous line of code do not output "\\" on Windows.
 InterveningSlashes = rep("",times=)
 InterveningSlashes[!EndWithSlash] <- "/"
@@ -386,7 +387,7 @@ UsingPraatcon = FALSE
 # (This is over-rided only if the user is using praatcon.exe)
 RunText = "--run"
 
-if( OSType=="windows" & SystemName=="Windows" ){
+if(OSType=="windows" & SystemName=="Windows"){
 	UserOS = "Windows" # For later down below in the code
 
 	# Make list of possible file paths to Praat-related executables, namely:
@@ -396,15 +397,15 @@ if( OSType=="windows" & SystemName=="Windows" ){
 	PossiblePraatconPaths = paste(LibraryDirectories,InterveningSlashes,"PraatR/praatcon.exe",sep="")
 
 	# Find which of these file paths point to files that actually exist
-	ExistingPraatPaths    = file.exists(PossiblePraatPaths   )
+	ExistingPraatPaths    = file.exists(PossiblePraatPaths)
 	ExistingPraatconPaths = file.exists(PossiblePraatconPaths)
 
 	# If neither Praat.exe nor praatcon.exe can be found in any of the enumerated places, issue an error message and stop computation
-	if( sum(c(ExistingPraatconPaths,ExistingPraatPaths))==0 ){ stop("Could not find Praat inside the folder for the PraatR package.\n       Make sure PraatR is properly installed.") }
+	if(sum(c(ExistingPraatconPaths,ExistingPraatPaths))==0){ stop("Could not find Praat inside the folder for the PraatR package.\n       Make sure PraatR is properly installed.") }
 
 	# Find out if only praatcon.exe (and not Praat.exe) is found
-	if( sum( ExistingPraatconPaths) >= 1 &
-		sum( ExistingPraatPaths) == 0 ){
+	if( sum(ExistingPraatconPaths) >= 1 &
+		sum(ExistingPraatPaths) == 0){
 		# Override the 'UsingPraatcon' variable to indicate this is the case
 		UsingPraatcon = TRUE
 		# Issue a warning instructing the user to swap out praatcon.exe for Praat.exe 6.0.08 or later
@@ -414,14 +415,14 @@ if( OSType=="windows" & SystemName=="Windows" ){
 		
 	# Regardless of whether praatcon.exe or Praat.exe is used, use the first path that exists
 	if(UsingPraatcon){
-		PraatPath = PossiblePraatconPaths[min( which(ExistingPraatconPaths) )]
+		PraatPath = PossiblePraatconPaths[min(which(ExistingPraatconPaths))]
 		RunText = "" # Do NOT include "--run" flag for praatcon.exe
 	}else{ # i.e. if using Praat.exe
-		PraatPath = PossiblePraatPaths[min( which(ExistingPraatPaths) )]
+		PraatPath = PossiblePraatPaths[min(which(ExistingPraatPaths))]
 	}
 
 }else{
-	if( OSType=="unix" & SystemName=="Darwin" ){
+	if( OSType=="unix" & SystemName=="Darwin"){
 		UserOS = "Mac" # For later down below in the code
 		PraatPath = "/Applications/Praat.app/Contents/MacOS/Praat"
 		# Presumably it will always be in this one fixed/stable location, but check just in case:
@@ -452,10 +453,10 @@ PossibleScriptPaths = paste(LibraryDirectories,InterveningSlashes,"PraatR/PraatS
 ExistingScriptPaths = file.exists(PossibleScriptPaths)
 
 # If the appropriate Praat script can't be found anywhere, issue an error message  and stop computation
-if( sum(ExistingScriptPaths)==0 ){ stop("Could not find the appropriate Praat script. Make sure PraatR is properly installed.") }
+if(sum(ExistingScriptPaths)==0 ){ stop("Could not find the appropriate Praat script. Make sure PraatR is properly installed.") }
 
 # Use the first path that exists
-ScriptPath = PossibleScriptPaths[min( which(ExistingScriptPaths) )]
+ScriptPath = PossibleScriptPaths[min(which(ExistingScriptPaths))]
 
 ###########################
 # Assemble command string #
@@ -483,8 +484,8 @@ CommandString = paste( PraatPath,
 intern = FALSE # Do *not* capture anything from the Info Window of Praat (for bringing back into R)
 
 # Now, finally issue the instruction to the OS
-if( UserOS == "Windows" ){ shell(cmd=CommandString, intern=intern) }
-if( UserOS == "Mac" | UserOS == "Linux" ){
+if(UserOS == "Windows"){ shell(cmd=CommandString, intern=intern) }
+if(UserOS == "Mac" | UserOS == "Linux"){
 # Escape any parentheses in the entire command string.
 CommandStringA = gsub(CommandString,pattern="(",replacement="\\(",fixed=TRUE)
 CommandStringB = gsub(CommandStringA,pattern=")",replacement="\\)",fixed=TRUE)
@@ -511,8 +512,8 @@ CommandString = paste( PraatPath,
 intern = TRUE # This indicates that the ultimate contents of the Info Window in Praat should be captured and brought back into R
 
 # Now, finally issue the instruction to the OS, and return the result
-if( UserOS == "Windows" ){ return(shell(cmd=CommandString, intern=intern)) }
-if( UserOS == "Mac" | UserOS == "Linux" ){
+if(UserOS == "Windows"){ return(shell(cmd=CommandString, intern=intern)) }
+if(UserOS == "Mac" | UserOS == "Linux" ){
 # Escape any parentheses in the entire command string.
 CommandStringA = gsub(CommandString,pattern="(",replacement="\\(",fixed=TRUE)
 CommandStringB = gsub(CommandStringA,pattern=")",replacement="\\)",fixed=TRUE)
